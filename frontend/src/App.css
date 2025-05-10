@@ -6,24 +6,20 @@
 
 body {
     background-color: rgb(0, 0, 0) !important;
-    width: 360px !important;
-    height: 780px !important;
 }
 
 #exercise-template {
-    display: hidden;
+    display: none;
 }
 
 #modify-exercise-weight {
-display:hidden;
+    display: none;
 }
 
+
 .page-header {
-display: flex;
-font-size: 40px;
-
-
-text-shadow: 2px 2px 5px rgb(202, 174, 17);
+    display: flex;
+    font-size: 40px;
 }
 
 .header-img {
@@ -88,10 +84,6 @@ text-shadow: 2px 2px 5px rgb(202, 174, 17);
 color: black;
 margin-top: 5px;
 border-radius: 5px;
-}
-
-input {
-color: black; 
 }
 
 .exercise-line {

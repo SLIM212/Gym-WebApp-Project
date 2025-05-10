@@ -1,0 +1,14 @@
+.header{
+    display: flex;
+    justify-content: center;
+    margin-top: 5%;
+}
+
+.dashboard-header {
+    color: white;
+    font: Poppins;
+}
+
+.exercise-container {
+    color: white;
+}
