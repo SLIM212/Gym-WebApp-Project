@@ -1,32 +1,52 @@
-import express from "express";
-import axios from 'axios';
-// import {login} from './auth';
+// Importing required modules
+import express, { Request, Response } from "express"; // Express framework and type definitions (for TypeScript)
+import cors from "cors"; // Cross-Origin Resource Sharing, allows your API to be accessible from different domains
+import dotenv from "dotenv"; // Loads environment variables from a .env file into process.env
+import axios from "axios"; // HTTP client for making requests to external APIs
 
-// going to need routes for logging in registering and querying database for exercises
+import {login, register} from './auth';
+// Load environment variables
+dotenv.config();
 
+// Initialize Express app
 const app = express();
+
+// Middleware
+app.use(cors()); 
 app.use(express.json());
 
-// Basic Test Functions
-app.get("/", (req, res) => {
+// Basic Test Routes
+app.get("/", (req: Request, res: Response) => {
     res.send("Backend Server Alive");
 });
 
-app.get("/info", (req, res) => {
-res.send("This is my gym tracker app");
-})
+app.get("/info", (req: Request, res: Response) => {
+    res.send("This is my gym tracker app");
+});
 
-const PORT = process.env.PORT || 3000;
+// Determine the port to listen on
+const PORT = process.env.PORT || 5000; // Use the environment variable PORT, or default to 5000
+
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
-// app.post('/auth/login', catchErrors(async (req, res) => {
-//   const { email, password, } = req.body;
-//   return res.json(await login(email, password));
-// }));
+/**
+ * Function to Login user
+ * @route POST /login
+ * @param {string} req.body.usernameOrEmail - username or email
+ * @param {string} req.body.password - password
+ * @returns {Response} -  Empty response with status code 200 for success 400 for fail
+ */
+app.post("/login", login);
 
-// app.post('/auth/register', catchErrors(async (req, res) => {
-//   const { email, password, name, } = req.body;
-//   return res.json(await register(email, password, name));
-// }));
+/**
+ * Function to Register user
+ * @route POST /register
+ * @param {string} req.body.username - username
+ * @param {string} req.body.email - email 
+ * @param {string} req.body.password  - password
+ * @returns {Response} - Empty response with status code 200 for success 400 for fail
+ */
+app.post("/register", register);

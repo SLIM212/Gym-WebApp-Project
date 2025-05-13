@@ -102,7 +102,8 @@ export default function Chest() {
                 })}
             </div>
             {/* need to show an input modal for exercise name and weight */}
-            <button onClick={() => setShowModal(true)} className="text-blue-500 underline">Add exercise</button>
+            <button onClick={() => setShowModal(true)}style={{color:'white', fontSize:'0.8em'}}>Add exercise +</button>
+            <br></br>
             <Link to={`/Dashboard`} className="text-blue-500 underline">Dashboard</Link>
         </>
     )
