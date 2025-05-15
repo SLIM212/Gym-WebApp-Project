@@ -4,7 +4,12 @@ import { useNavigate, Link } from 'react-router-dom'
 import './pages.css';
 
 export default function DashBoard() {
-
+    const navigate = useNavigate();
+    const Logout = () => {
+        localStorage.removeItem('user-token');
+        localStorage.removeItem('user-email');
+        navigate('/login');
+    }
 return (
     <div className="App">
         <div className="page-header text-center dashboard-header">
@@ -20,6 +25,7 @@ return (
         <br></br>
         <Link to={`/exercise/Arms`} className="text-blue-500 underline">Arms</Link>
         <p className="text-center fw-light" style={{marginTop: '40px', color:'#E0BB20'}} >About Us</p>
+        <button onClick={Logout}className="text-blue-500 underline">Logout</button>
     </div>
 );
 }

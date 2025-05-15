@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import Popup from '../components/popup.tsx';
+import Popup from '../components/Popup.tsx';
 import { useNavigate, Link } from 'react-router-dom';
 import '../index.css';
 
 function Register() {
     const navigate = useNavigate();
-    const [name, setName] = useState('')
+    const [username, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -34,52 +34,57 @@ function Register() {
         setMessage('');  // Clear general message
     };
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault()
-    //     setError('')
-    //     if (!name || !email || !password || !confirmPassword) {
-        //     setError('Please fill in all fields.')
-        //     return
-    //     }
-    //     if (password !== confirmPassword) {
-        //     setError('Passwords do not match.')
-        //     return
-    //     }
-    //     // Prepare the data for the API call
-    //     const requestData = {
-        //     email,
-        //     password,
-        //     name
-    //     };
-    //     // send an api call to the backend
-    //     try {
-    //     // Send the POST request to the backend
-    //     const response = await fetch('http://localhost:5005/admin/auth/register', {
-    //         method: 'POST', // Specify the HTTP method
-    //         headers: {
-    //         'Content-Type': 'application/json', // Send data as JSON
-    //         },
-    //         body: JSON.stringify(requestData), // Convert the request data to a JSON string
-    //     });
-    //     // Handle successful registration
-    //     const data = await response.json();
-    //     if (!response.ok) {
-    //         throw new Error(data.error);
-    //     }
-    //     setLogIn(); // Call the setLogIn function to indicate the user is logged in
-    //     navigate('/dashboard'); // Redirect to the Dashboard page
-    //     localStorage.setItem('user-email', email); // to use for creating games
-    //     localStorage.setItem('user-token', data.token); // save token to localStorage
-    //     } catch (error) {
-    //     setError(error.message); // Display error message if the API call fails
-    //     }
-    // }
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setError('')
+        if (!username || !email || !password || !confirmPassword) {
+            setError('Please fill in all fields.')
+            return
+        }
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.')
+            return
+        }
+        // Prepare the data for the API call
+        const requestData = {
+            username,
+            email,
+            password
+        };
+        // send an api call to the backend
+        try {
+        // Send the POST request to the backend
+        const response = await fetch('http://localhost:5000/register', {
+            method: 'POST', // Specify the HTTP method
+            headers: {
+            'Content-Type': 'application/json', // Send data as JSON
+            },
+            body: JSON.stringify(requestData), // Convert the request data to a JSON string
+        });
+        // Handle successful registration
+        console.log(response)
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error);
+        }
+        navigate('/login'); // Redirect to the login page
+        localStorage.setItem('user-email', email);
+        // localStorage.setItem('user-token', data.token); // save token to localStorage
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+                console.log(error.message)
+            } else {
+                setError("An unknown error occurred");
+            }
+        }
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-6">
         <div className="w-full max-w-sm">
             <form
-            // onSubmit={handleSubmit}
+            onSubmit={handleSubmit}
             className="bg-white p-6 rounded shadow-md space-y-4"
             >
             <h2 className="text-2xl font-bold text-center">Register</h2>
@@ -93,7 +98,7 @@ function Register() {
             <input
                 type="text"
                 placeholder="Name"
-                value={name}
+                value={username}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full p-2 border rounded"
                 required
@@ -130,7 +135,7 @@ function Register() {
             </button>
             </form>
             <Link to="/login" className="text-blue-600 hover:underline block text-center mt-4">
-            Already have an account? Login
+                Already have an account? Login
             </Link>
         </div>
         </div>

@@ -1,36 +1,77 @@
-// ExerciseGroup.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Exercise from "../components/exercise";
 import './pages.css';
+import apiCall from "../helpers/apiCall.tsx";
+import Popup from '../components/Popup.tsx';
 
 type Exercise = {
     exerciseName: string;
     exerciseWeight: number;
-    };
+};
 
-    export default function ExerciseGroup() {
+export default function ExerciseGroup() {
     const { group } = useParams<{ group: string }>(); 
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [exerciseName, setExerciseName] = useState("");
     const [exerciseWeight, setExerciseWeight] = useState("");
-
+    const [errorPopup, setError] = useState('')
+    const [messagePopup, setMessage] = useState('')
+    const [popupVisible, setMessageVisible] = useState(false);
+    
+    // Trigger the popup visibility when either errorPopup or messagePopup changes
     useEffect(() => {
-        const storedExercises = localStorage.getItem(`${group?.toLowerCase()}-exercises`);
-        if (storedExercises) {
-        setExercises(JSON.parse(storedExercises));
+        if (errorPopup || messagePopup) {
+            setMessageVisible(true);  // Show popup if there's an error or message
         }
-    }, [group]);
+    }, [errorPopup, messagePopup]);
 
-    const addExercise = (exerciseName: string, exerciseWeight: number) => {
+    // Handle popup close action
+    const closePopup = () => {
+        setMessageVisible(false);
+        setError('');  // Clear error message
+        setMessage('');  // Clear general message
+    };
+    
+    useEffect(() => {
+        getAllExercises();
+    }, [group, exercises]);
+    // get all exercises when page first loads
+    const getAllExercises = async () => {
+        const storedExercises = await apiCall({url: 'getAllExercises', method: 'GET'});
+        if (storedExercises) {
+            setExercises(storedExercises);
+        }
+    }
+
+    const addExercise = async (exerciseName: string, exerciseWeight: number) => {
         const updatedExercises = [...exercises, { exerciseName, exerciseWeight }];
+        // need to switch this with a call to the backend
         localStorage.setItem(`${group?.toLowerCase()}-exercises`, JSON.stringify(updatedExercises));
-        setExercises(updatedExercises);
+        try {
+            // body takes in  exerciseSection, exerciseName, exerciseWeight
+            await apiCall({url: 'createExercise', method: 'PUT', 
+                body: {exerciseSection: group, exerciseName: exerciseName, exerciseWeight: exerciseWeight}});
+            setExercises(updatedExercises);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError("An unexpected error occurred");
+            }
+        }
     };
 
     return (
         <>
+        {popupVisible && (
+                <Popup
+                message={errorPopup || messagePopup}
+                status={errorPopup ? 'error' : 'success'}
+                onClose={closePopup}
+                />
+        )}
         {showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-4 rounded shadow-lg">

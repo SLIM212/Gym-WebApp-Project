@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "username": "sameeee",
+      "email": "sam@serrrrr.com",
+      "password": "Darknugget24"
+    },
+    {
+      "userId": "53f1fca4-d627-4814-877f-2b82fb90c70f",
+      "username": "samLim",
+      "email": "sam@email.com",
+      "password": "123456789012"
+    },
+    {
+      "userId": "d0c86737-dc71-4a51-8719-b0a679ea5436",
+      "username": "samLime",
+      "email": "sam@emaill.com",
+      "password": "123456789012"
+    },
+    {
+      "userId": "f62d024c-8776-47a1-a952-6d7d606ca7a9",
+      "username": "samlimmm",
+      "email": "sam@emaeil.com",
+      "password": "1234567890123456"
+    },
+    {
+      "userId": "542538b7-a617-4e6f-bce6-a70319c77007",
+      "username": "samlimmmee",
+      "email": "sam@emaeeil.com",
+      "password": "1234567890123456"
+    },
+    {
+      "userId": "876cce4e-a06c-42ca-a8fb-4ca37ceadd89",
+      "username": "samlimmmeee",
+      "email": "sam@emaeeeil.com",
+      "password": "1234567890123456"
+    }
+  ],
+  "exercises": []
+}

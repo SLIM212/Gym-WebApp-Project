@@ -3,8 +3,12 @@ import express, { Request, Response } from "express"; // Express framework and t
 import cors from "cors"; // Cross-Origin Resource Sharing, allows your API to be accessible from different domains
 import dotenv from "dotenv"; // Loads environment variables from a .env file into process.env
 import axios from "axios"; // HTTP client for making requests to external APIs
-
+import {getAllExercises, createOrUpdateExercise} from "./data"
 import {login, register} from './auth';
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET: string = 'gymappforthewin';
+
 // Load environment variables
 dotenv.config();
 
@@ -32,6 +36,16 @@ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
+//////////////// for cloud deployment/////////////
+// // Determine the port to listen on
+// const PORT = process.env.PORT || 5000; // Use the environment variable PORT, or default to 5000
+
+// // Start the server
+// app.listen(PORT, '0.0.0.0', () => {
+//     console.log(`Server running on http://0.0.0.0:${PORT}`);
+// });
+
+
 /**
  * Function to Login user
  * @route POST /login
@@ -50,3 +64,11 @@ app.post("/login", login);
  * @returns {Response} - Empty response with status code 200 for success 400 for fail
  */
 app.post("/register", register);
+
+// going to need routes to get exercises for each user
+// chest, back, arms and leg exercises
+app.get("/getAllExercises", getAllExercises);
+app.put("/createExercise", createOrUpdateExercise);
+// app.get takes in token and body part and returns all exercises currently in that part for user
+// app.post takes in token and body part and exercise object whcih has exercise name and weight
+// stores in the users file in the sql database
