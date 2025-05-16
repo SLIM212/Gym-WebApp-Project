@@ -12,3 +12,11 @@
 .exercise-container {
     color: white;
 }
+
+.header-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 54px;
+    width: 70%;
+}

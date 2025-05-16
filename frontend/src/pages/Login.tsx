@@ -5,7 +5,7 @@ import '../index.css';
 
 function Login() {
     const navigate = useNavigate();
-    const [emailorUserName, setEmailorUserName] = useState('')
+    const [usernameOrEmail, setEmailorUserName] = useState('')
     const [password, setPassword] = useState('')
     const [errorPopup, setError] = useState('')
     const [messagePopup, setMessage] = useState('')
@@ -36,15 +36,16 @@ function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setError('')
-        if (!emailorUserName || !password) {
+        if (!usernameOrEmail || !password) {
             setError('Please enter both email and password.')
         return
         }
         // Prepare the data for the API call
         const requestData = {
-            emailorUserName,
+            usernameOrEmail,
             password,
         };
+        console.log(requestData)
         // send an api call to the backend
         try {
         // Send the POST request to the backend
@@ -55,17 +56,15 @@ function Login() {
             },
             body: JSON.stringify(requestData), // Convert the request data to a JSON string
         });
-        console.log('sd')
         // Handle successful registration
         const data = await response.json();
         if (!response.ok) {
             throw new Error(data.error);
         }
-        console.log('sd')
         navigate('/dashboard'); // Redirect to the Dashboard page
         localStorage.setItem('user-token', data.token); // save token to localStorage
         // to use for creating games
-        localStorage.setItem('user-email', emailorUserName);
+        localStorage.setItem('user-email', usernameOrEmail);
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message);
@@ -94,7 +93,7 @@ function Login() {
                 <input
                     type="text"
                     placeholder="Email or Username"
-                    value={emailorUserName}
+                    value={usernameOrEmail}
                     onChange={(e) => setEmailorUserName(e.target.value)}
                     className="w-full p-2 border rounded"
                     required

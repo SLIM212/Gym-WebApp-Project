@@ -36,5 +36,29 @@
       "password": "1234567890123456"
     }
   ],
-  "exercises": []
+  "exercises": [
+    {
+      "userId": null,
+      "exercises": {
+        "chest": [],
+        "arms": [],
+        "legs": [],
+        "back": []
+      }
+    },
+    {
+      "userId": "53f1fca4-d627-4814-877f-2b82fb90c70f",
+      "exercises": {
+        "chest": [],
+        "arms": [],
+        "legs": [],
+        "back": [
+          {
+            "exerciseName": "fdsf",
+            "exerciseWeight": 123
+          }
+        ]
+      }
+    }
+  ]
 }

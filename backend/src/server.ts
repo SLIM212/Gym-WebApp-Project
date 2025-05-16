@@ -45,7 +45,6 @@ app.listen(PORT, () => {
 //     console.log(`Server running on http://0.0.0.0:${PORT}`);
 // });
 
-
 /**
  * Function to Login user
  * @route POST /login

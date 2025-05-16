@@ -16,18 +16,9 @@ body {
     display: none;
 }
 
-
 .page-header {
     display: flex;
     font-size: 40px;
-}
-
-.header-img {
-    display:flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 67px;
-    width: 70%;
 }
 
 .exercise-group-header {

@@ -125,9 +125,8 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
     const { exerciseSection, exerciseName, exerciseWeight } = req.body;
     // need to get userId by decoding authoization header token//
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
-
     if (!token) {
-        throw new Error("Token is required");
+        res.status(401).json({ error: "Token is required" });
     }
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as { sub: string };
@@ -139,17 +138,16 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
         }
         // Find the user's exercise data
         let userExercises = database.exercises.find(entry => entry.userId === userId);
-        
-        // If the user does not exist, create a new user entry
+        // If the user's exercise data does not exist, create a new user entry
         if (!userExercises) {
             userExercises = { userId, exercises: { chest: [], arms: [], legs: [], back: [] } };
             database.exercises.push(userExercises);
         }
-
         // Find the body part section (e.g., chest, arms, etc.)
         let bodyPartExercises = userExercises.exercises[exerciseSection as keyof typeof userExercises.exercises];
         if (!bodyPartExercises) {
-            throw new Error("Invalid body part section");
+            res.status(400).json({ error: "Invalid body part section"});
+            return
         }
         // Check if the exercise already exists in the body part
         const existingExercise = bodyPartExercises.find(exercise => exercise.exerciseName === exerciseName);
@@ -167,40 +165,33 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
             res.status(201).json({ message: "Exercise created", exercise: { exerciseName, exerciseWeight } });
         }
     } catch (err) {
-        throw new Error("Invalid or expired token");
+        res.status(401).json({ error: "Invalid or expired token" });
     }
 };
 
 
 // Get all exercises for a user
 export const getAllExercises = async (req: Request, res: Response): Promise<void> => {
-    const usernameOrEmail = req.query.usernameOrEmail as string;
-    // need to get userId by decoding authoization header token//
-    let userId: string | null = '';
     // need to get userId by decoding authoization header token//
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
-        throw new Error("Token is required");
+        res.status(401).json({ error: "Token is required" });
     }
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as { sub: string };
         const userId = decoded.sub;
         // Ensure the username or email is provided in the query
-        if (!usernameOrEmail) {
-            res.status(400).json({ message: "Username or email required" });
-            return;
-        }
         // Find the user's exercises from the database
         const userExercises = database.exercises.find(entry => entry.userId === userId);
         // If the user doesn't have any exercises, return an empty list
         if (!userExercises) {
-            res.status(200).json({ exercises: [] });
+            res.status(200).json({ exercises: { chest: [], arms: [], legs: [], back: [] }  });
             return;
         }
         // If exercises are found, return them
         res.status(200).json({ exercises: userExercises.exercises });
     } catch(err) {
-        throw new Error("Invalid or expired token");
+        res.status(401).json({ error: "Invalid or expired token" });
     }
 };
 

@@ -36,12 +36,22 @@ export default function ExerciseGroup() {
     
     useEffect(() => {
         getAllExercises();
-    }, [group, exercises]);
+    }, [group]);
     // get all exercises when page first loads
     const getAllExercises = async () => {
-        const storedExercises = await apiCall({url: 'getAllExercises', method: 'GET'});
-        if (storedExercises) {
-            setExercises(storedExercises);
+        try {
+            const storedExercises = await apiCall({url: 'getAllExercises', method: 'GET'});
+            console.log(storedExercises.exercises.back)
+            console.log(group)
+            if (storedExercises) {
+                setExercises(storedExercises.exercises.back);
+            }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     }
 
@@ -54,6 +64,10 @@ export default function ExerciseGroup() {
             await apiCall({url: 'createExercise', method: 'PUT', 
                 body: {exerciseSection: group, exerciseName: exerciseName, exerciseWeight: exerciseWeight}});
             setExercises(updatedExercises);
+            // After successfully adding, fetch fresh exercises from backend
+            await getAllExercises();
+            setError('');
+            setMessage('Exercise added successfully!');
         } catch (error: unknown) {
             if (error instanceof Error) {
                 setError(error.message);
