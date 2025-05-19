@@ -14,6 +14,7 @@ const DATABASE_PATH = './database.json';
 type ExerciseCategory = {
     exerciseName: string;
     exerciseWeight: number;
+    exerciseId: string;
 };
 
 type User = {
@@ -122,7 +123,9 @@ export function changePassword(usernameOrEmail: string, newPassword: string): vo
 // Creates or updates an exercise for a user
 // Takes in exercise body part, exercise name, and exercise weight
 export const createOrUpdateExercise = async (req: Request, res: Response): Promise<void> => {
-    const { exerciseSection, exerciseName, exerciseWeight } = req.body;
+    const { exerciseSection, exerciseName, exerciseWeight, exerciseId } = req.body;
+    console.log(exerciseId);
+    console.log("fdssf")
     // need to get userId by decoding authoization header token//
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
@@ -132,9 +135,8 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
         const decoded = jwt.verify(token, JWT_SECRET) as { sub: string };
         const userId = decoded.sub;
         // Validate input
-        if (!exerciseSection || !exerciseName || !exerciseWeight) {
+        if (!exerciseSection || !exerciseName || !exerciseWeight || !exerciseId) {
             throw new Error("Invalid data" );
-            
         }
         // Find the user's exercise data
         let userExercises = database.exercises.find(entry => entry.userId === userId);
@@ -149,17 +151,21 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
             res.status(400).json({ error: "Invalid body part section"});
             return
         }
-        // Check if the exercise already exists in the body part
-        const existingExercise = bodyPartExercises.find(exercise => exercise.exerciseName === exerciseName);
+        console.log("dfddd")
+        // Check if the exercise already exists in the body part through exerciseId
+        const existingExercise = bodyPartExercises.find(exercise => exercise.exerciseId === exerciseId);
         if (existingExercise) {
-            // If the exercise exists, update the weight
+            // If the exercise exists, update the weight and name
+            existingExercise.exerciseName = exerciseName;
             existingExercise.exerciseWeight = exerciseWeight;
             // Save the updated database
             saveDatabase();
             res.status(200).json({ message: "Exercise updated", exercise: existingExercise });
         } else {
-            // If the exercise doesn't exist, add it
-            bodyPartExercises.push({ exerciseName, exerciseWeight });
+            console.log("df")
+            // If the exercise doesn't exist, add it generate exercise Id 
+            const exerciseId = generateExerciseId();
+            bodyPartExercises.push({ exerciseId, exerciseName, exerciseWeight });
             // Save the updated database
             saveDatabase();
             res.status(201).json({ message: "Exercise created", exercise: { exerciseName, exerciseWeight } });
@@ -172,7 +178,7 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
 
 // Get all exercises for a user
 export const getAllExercises = async (req: Request, res: Response): Promise<void> => {
-    // need to get userId by decoding authoization header token//
+    // need to get userId by decoding authoization header token //
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
@@ -194,6 +200,17 @@ export const getAllExercises = async (req: Request, res: Response): Promise<void
         res.status(401).json({ error: "Invalid or expired token" });
     }
 };
+
+// delete given exercise
+export const deleteExercise = async (req: Request, res: Response): Promise<void> => {
+    const { exerciseId } = req.body;
+    // need to get userId by decoding authoization header token //
+    const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
+    if (!token) {
+        res.status(401).json({ error: "Token is required" });
+    }
+    // go through exercise library looking for matching id and delete the exercise that has a matching id
+}
 
 /**********************************
  * Helper Functions
@@ -219,4 +236,7 @@ const generateUserId = (): string => {
     return uuidv4(); // Generates a unique user ID
 };
 
+const generateExerciseId = (): string => {
+    return uuidv4(); // Generates a unique user ID
+};
 

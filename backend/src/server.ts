@@ -3,7 +3,7 @@ import express, { Request, Response } from "express"; // Express framework and t
 import cors from "cors"; // Cross-Origin Resource Sharing, allows your API to be accessible from different domains
 import dotenv from "dotenv"; // Loads environment variables from a .env file into process.env
 import axios from "axios"; // HTTP client for making requests to external APIs
-import {getAllExercises, createOrUpdateExercise} from "./data"
+import {getAllExercises, createOrUpdateExercise, deleteExercise} from "./data"
 import {login, register} from './auth';
 import jwt from "jsonwebtoken";
 
@@ -68,6 +68,7 @@ app.post("/register", register);
 // chest, back, arms and leg exercises
 app.get("/getAllExercises", getAllExercises);
 app.put("/createExercise", createOrUpdateExercise);
+app.delete("/deleteExercise", deleteExercise)
 // app.get takes in token and body part and returns all exercises currently in that part for user
 // app.post takes in token and body part and exercise object whcih has exercise name and weight
 // stores in the users file in the sql database
