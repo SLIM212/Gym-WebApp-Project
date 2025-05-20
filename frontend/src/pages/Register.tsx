@@ -62,7 +62,6 @@ function Register() {
             body: JSON.stringify(requestData), // Convert the request data to a JSON string
         });
         // Handle successful registration
-        console.log(response)
         const data = await response.json();
         if (!response.ok) {
             throw new Error(data.error);
@@ -73,7 +72,6 @@ function Register() {
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message);
-                console.log(error.message)
             } else {
                 setError("An unknown error occurred");
             }

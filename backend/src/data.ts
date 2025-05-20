@@ -49,8 +49,9 @@ let database: Database = {
 (function initializeDatabase() {
     if (fs.existsSync(DATABASE_PATH)) {
         console.log("Loading Existing Database");
-        database = JSON.parse(fs.readFileSync(DATABASE_PATH, { encoding: 'utf-8' })) as Database;
-
+        
+        const fileContents = fs.readFileSync(DATABASE_PATH, { encoding: 'utf8' }).trim();
+        database = JSON.parse(fileContents) as Database;
         // Ensure the structure is properly loaded
         if (!Array.isArray(database.users)) database.users = [];
         if (!Array.isArray(database.exercises)) database.exercises = [];
@@ -124,8 +125,6 @@ export function changePassword(usernameOrEmail: string, newPassword: string): vo
 // Takes in exercise body part, exercise name, and exercise weight
 export const createOrUpdateExercise = async (req: Request, res: Response): Promise<void> => {
     const { exerciseSection, exerciseName, exerciseWeight, exerciseId } = req.body;
-    console.log(exerciseId);
-    console.log("fdssf")
     // need to get userId by decoding authoization header token//
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
@@ -151,7 +150,6 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
             res.status(400).json({ error: "Invalid body part section"});
             return
         }
-        console.log("dfddd")
         // Check if the exercise already exists in the body part through exerciseId
         const existingExercise = bodyPartExercises.find(exercise => exercise.exerciseId === exerciseId);
         if (existingExercise) {
@@ -162,7 +160,6 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
             saveDatabase();
             res.status(200).json({ message: "Exercise updated", exercise: existingExercise });
         } else {
-            console.log("df")
             // If the exercise doesn't exist, add it generate exercise Id 
             const exerciseId = generateExerciseId();
             bodyPartExercises.push({ exerciseId, exerciseName, exerciseWeight });
@@ -203,13 +200,42 @@ export const getAllExercises = async (req: Request, res: Response): Promise<void
 
 // delete given exercise
 export const deleteExercise = async (req: Request, res: Response): Promise<void> => {
-    const { exerciseId } = req.body;
+    const { exerciseId, exerciseSection } = req.body;
     // need to get userId by decoding authoization header token //
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
     }
-    // go through exercise library looking for matching id and delete the exercise that has a matching id
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { sub: string };
+        const userId = decoded.sub;
+        // Validate input
+        if (!exerciseSection || !exerciseId) {
+            throw new Error("Invalid data" );
+        }
+         // Find the user's exercise data
+        let userExercises = database.exercises.find(entry => entry.userId === userId);
+        if (!userExercises) {
+            res.status(400).json({ error: "No user exercises"});
+        } else {
+            // go through exercise library looking for matching id and delete the exercise that has a matching id
+            // Find the body part section (e.g., chest, arms, etc.)
+            let bodyPartExercises = userExercises.exercises[exerciseSection as keyof typeof userExercises.exercises];
+            if (!bodyPartExercises) {
+                res.status(400).json({ error: "Invalid body part section"});
+                return
+            }
+            const index = bodyPartExercises.findIndex(ex => ex.exerciseId === exerciseId);
+            if (index !== -1) {
+                bodyPartExercises.splice(index, 1);
+            }
+            // Save the updated database
+            saveDatabase();
+            res.status(201).json({ message: "Exercise Deleted"});
+        }
+    } catch (err) {
+        res.status(401).json({ error: "Invalid or expired token" });
+    }
 }
 
 /**********************************

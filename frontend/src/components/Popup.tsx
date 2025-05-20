@@ -9,8 +9,8 @@ interface PopupProps {
 const Popup = ({ message, status, onClose }: PopupProps) => {
     useEffect(() => {
         const timer = setTimeout(() => {
-        onClose?.(); // call close handler after 4 seconds
-        }, 4000);
+        onClose?.();
+        }, 2000);
         return () => clearTimeout(timer);
     }, [onClose]);
 

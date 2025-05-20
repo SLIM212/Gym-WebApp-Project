@@ -7,7 +7,7 @@ type ExerciseProps = {
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     setEdit: React.Dispatch<React.SetStateAction<boolean>>;
     setExerciseToEdit: React.Dispatch<React.SetStateAction<[string, string, number] | null>>;
-    setExerciseToDelete: React.Dispatch<React.SetStateAction<[string] | null>>;
+    setExerciseToDelete: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 
@@ -16,7 +16,7 @@ const Exercise = ({ exerciseId, exerciseName, exerciseWeight, setShowModal, setE
         <>
             {exerciseName} - {exerciseWeight}kg 
             <button onClick={() =>{setShowModal(true); setEdit(true), setExerciseToEdit([exerciseId, exerciseName, exerciseWeight])}}>Edit</button>
-            <button onClick={() => {setExerciseToDelete([exerciseId])}}>Delete</button>
+            <button onClick={() => {setExerciseToDelete(exerciseId)}}>Delete</button>
         </>
     )
 }

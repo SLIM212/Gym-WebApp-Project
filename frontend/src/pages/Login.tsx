@@ -45,7 +45,6 @@ function Login() {
             usernameOrEmail,
             password,
         };
-        console.log(requestData)
         // send an api call to the backend
         try {
         // Send the POST request to the backend

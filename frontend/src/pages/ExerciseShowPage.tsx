@@ -4,6 +4,7 @@ import Exercise from "../components/exercise";
 import './pages.css';
 import apiCall from "../helpers/apiCall.tsx";
 import Popup from '../components/Popup.tsx';
+import { useNavigate} from 'react-router-dom'
 
 type Exercise = {
     exerciseId: string;
@@ -23,8 +24,9 @@ export default function ExerciseGroup() {
     const [messagePopup, setMessage] = useState('')
     const [popupVisible, setMessageVisible] = useState(false);
     const [exerciseToEdit, setExerciseToEdit] = useState<[string, string, number] | null>(null);
-    const [exerciseToDelete, setExerciseToDelete] = useState<[string] | null>(null);
-    
+    const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
+    const navigate = useNavigate();
+
     // Trigger the popup visibility when either errorPopup or messagePopup changes
     useEffect(() => {
         if (errorPopup || messagePopup) {
@@ -38,6 +40,12 @@ export default function ExerciseGroup() {
         setError('');  // Clear error message
         setMessage('');  // Clear general message
     };
+
+    useEffect(() => {
+        // Clear popup when route changes
+        setError('');  // Clear error message
+        setMessage('');  // Clear general message
+    }, [location]);
     
     useEffect(() => {
         if (editExercise && exerciseToEdit) {
@@ -54,11 +62,38 @@ export default function ExerciseGroup() {
     }, [group]);
 
     useEffect(() => {
-        deleteExercise();
-    }, [exerciseToDelete])
+        if (exerciseToDelete) {
+            deleteExercise();
+        }
+    }, [exerciseToDelete]);
 
-    const deleteExercise = () => {
+    const Logout = () => {
+        localStorage.removeItem('user-token');
+        localStorage.removeItem('user-email');
+        navigate('/login');
+    }
+
+    const deleteExercise = async () => {
         // need to send exerciseToDelete info to backend to delet, might need new endpoint for this one
+        try {
+            // body takes in exerciseSection, exerciseName, exerciseWeight
+            await apiCall({url: 'deleteExercise', method: 'DELETE', 
+                body: {exerciseSection: group, exerciseId: exerciseToDelete}});
+            // After successfully adding, fetch fresh exercises from backend
+            await getAllExercises();
+            setError('');
+            setMessage('Exercise deleted successfully!');
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+                // need to log out if token is expired
+                if (error.message == "Invalid or expired token") {
+                    Logout();
+                }
+            } else {
+                setError("An unexpected error occurred");
+            }
+        }
     }
     // get all exercises when page first loads
     const getAllExercises = async () => {
@@ -71,6 +106,10 @@ export default function ExerciseGroup() {
         } catch (error: unknown) {
             if (error instanceof Error) {
                 setError(error.message);
+                // need to log out if token is expired
+                if (error.message == "Invalid or expired token") {
+                    Logout();
+                }
             } else {
                 setError("An unexpected error occurred");
             }
@@ -86,15 +125,29 @@ export default function ExerciseGroup() {
             // After successfully adding, fetch fresh exercises from backend
             await getAllExercises();
             setError('');
-            setMessage('Exercise added successfully!');
+            if (editExercise) {
+                setMessage('Exercise edited successfully!');
+            } else {
+                setMessage('Exercise added successfully!');
+            }
         } catch (error: unknown) {
             if (error instanceof Error) {
                 setError(error.message);
+                // need to log out if token is expired
+                if (error.message == "Invalid or expired token") {
+                    Logout();
+                }
             } else {
                 setError("An unexpected error occurred");
             }
         }
     };
+
+    function capitalizeFirstLetter(str: string | undefined): string {
+        if (!str) return "";
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
 
     return (
         <>
@@ -109,7 +162,7 @@ export default function ExerciseGroup() {
         {showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                 <div className="bg-white p-4 rounded shadow-lg">
-                    <h2 className="text-xl font-bold mb-2">{editExercise ? "Edit Exercise" : "Add New Exercise"}</h2>
+                    <h2 className="text-xl font-bold mb-2">{editExercise ? `Edit ${capitalizeFirstLetter(group)} Exercise` : `Add ${capitalizeFirstLetter(group)} Exercise`}</h2>
 
                     <input 
                         type="text" 
@@ -120,7 +173,7 @@ export default function ExerciseGroup() {
                     />
                     <input 
                         type="number" 
-                        placeholder="Exercise Weight" 
+                        placeholder="Exercise Weight (kg)" 
                         value={exerciseWeight}
                         onChange={(e) => setExerciseWeight(e.target.value)} 
                         className="block mb-2 p-2 border"
@@ -153,7 +206,7 @@ export default function ExerciseGroup() {
         )}
 
 
-        <h1 className="flex items-center text-4xl font-extrabold text-white header">{group} Exercises</h1>
+        <h1 className="flex items-center text-4xl font-extrabold text-white header">{capitalizeFirstLetter(group)} Exercises</h1>
         <div className="exercise-container">
             {exercises.map((exercise, index) => (
             <div key={index}>
