@@ -24,11 +24,11 @@ export default function DashBoard() {
     }
 return (
     <div className="App">
-        <div className="page-header text-center dashboard-header">
+        <div className="page-header text-center dashboard-header" style={{color:"#fffffe"}}>
             Gym Progress Tracker
         </div>
         <img
-            className="header-img block mx-auto"
+            className="w-[70%] mx-auto"
             src={dapImage}
             alt="dap-img"
         />
@@ -40,7 +40,7 @@ return (
                 key={name}
                 to={path}
                 className={`
-                    w-40 h-40 bg-gray-900 rounded-xl border-t-4 ${color} relative overflow-hidden
+                    w-35 h-35 bg-gray-900 rounded-xl border-t-4 ${color} relative overflow-hidden
                     transform transition-all duration-300
                     hover:scale-105 hover:shadow-lg hover:shadow-${color.replace('border-', '')}/50
                     group
@@ -61,7 +61,11 @@ return (
             ))}
         </div>
         <div className="w-full flex justify-end p-4">
-            <button onClick={Logout} className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded inline-flex items-center">
+            <button
+                onClick={Logout}
+                style={{ backgroundColor: '#e53170' }}
+                className="hover:brightness-110 text-white font-semibold py-2 px-4 rounded inline-flex items-center"
+            >
                 Logout
                 <LogOut className="w-5 h-5 ml-2" />
             </button>

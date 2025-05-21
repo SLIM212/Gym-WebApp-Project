@@ -81,7 +81,13 @@
       "userId": "2c1f8964-5b36-4495-9b41-02b9ececb05e",
       "exercises": {
         "chest": [],
-        "arms": [],
+        "arms": [
+          {
+            "exerciseId": "7a3ea966-21ff-44b8-a98a-3ed565f70b05",
+            "exerciseName": "Bicep curls",
+            "exerciseWeight": 222
+          }
+        ],
         "legs": [],
         "back": [
           {

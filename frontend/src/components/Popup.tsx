@@ -19,7 +19,7 @@ const Popup = ({ message, status, onClose }: PopupProps) => {
     const bgColor = status === 'error' ? 'bg-red-500' : 'bg-blue-500';
 
     return (
-        <div className={`fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] min-w-[300px] max-w-[80%] ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex justify-between items-center`}>
+        <div className={`fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] min-w-[270px] max-w-[40%] ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex justify-between items-center`}>
         <span>
             {message.split('\n').map((line, i) => (
             <span key={i}>

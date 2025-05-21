@@ -204,8 +204,6 @@ export default function ExerciseGroup() {
                 </div>
             </div>
         )}
-
-
         <h1 className="flex items-center text-4xl font-extrabold text-white header">{capitalizeFirstLetter(group)} Exercises</h1>
         <div className="exercise-container">
             {exercises.map((exercise, index) => (
@@ -222,9 +220,33 @@ export default function ExerciseGroup() {
             </div>
             ))}
         </div>
-        <button onClick={() => setShowModal(true)} style={{color:'white', fontSize:'0.8em'}}>Add exercise +</button>
+        <button
+            onClick={() => setShowModal(true)}
+            className="add-exercise"
+            >
+            + Add exercise
+        </button>
         <br />
-        <Link to={`/Dashboard`} className="text-blue-500 underline">Dashboard</Link>
+        <button
+            onClick={() => navigate('/Dashboard')}
+            style={{ backgroundColor: '#ff8906', marginTop: "8%", marginLeft:"5%" }}
+            className="hover:brightness-110 text-white font-semibold py-2 pl-1 pr-3 rounded inline-flex items-center"
+            >
+            <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ marginRight: '1px' }}
+            >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
+
+            Dashboard
+        </button>
+
         </>
     );
 }

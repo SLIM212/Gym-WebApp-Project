@@ -18,7 +18,9 @@ body {
 
 .page-header {
     display: flex;
+    justify-content: center;
     font-size: 40px;
+    margin-top: 5%;
 }
 
 .exercise-group-header {
