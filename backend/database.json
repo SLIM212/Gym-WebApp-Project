@@ -76,6 +76,21 @@
           }
         ]
       }
+    },
+    {
+      "userId": "2c1f8964-5b36-4495-9b41-02b9ececb05e",
+      "exercises": {
+        "chest": [],
+        "arms": [],
+        "legs": [],
+        "back": [
+          {
+            "exerciseId": "5df90394-1797-4ad4-9e53-208bcdc1662c",
+            "exerciseName": "Low rows",
+            "exerciseWeight": 225
+          }
+        ]
+      }
     }
   ]
 }

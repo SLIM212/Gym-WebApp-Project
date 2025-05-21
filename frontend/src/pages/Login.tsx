@@ -74,7 +74,7 @@ function Login() {
             
     }
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-6">
             <div className="flex flex-col">
                 <form
                     onSubmit={handleSubmit}

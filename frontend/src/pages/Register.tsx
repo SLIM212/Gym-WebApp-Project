@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Popup from '../components/Popup.tsx';
 import { useNavigate, Link } from 'react-router-dom';
 import '../index.css';
+import '../App.css';
 
 function Register() {
     const navigate = useNavigate();
@@ -79,65 +80,62 @@ function Register() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-6">
-        <div className="w-full max-w-sm">
-            <form
-            onSubmit={handleSubmit}
-            className="bg-white p-6 rounded shadow-md space-y-4"
-            >
-            <h2 className="text-2xl font-bold text-center">Register</h2>
-            {popupVisible && (
-                <Popup
-                message={errorPopup || messagePopup}
-                status={errorPopup ? 'error' : 'success'}
-                onClose={closePopup}
+        <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-6">
+            <div className="w-full max-w-sm">
+                <form
+                onSubmit={handleSubmit}
+                className="bg-white p-6 rounded shadow-md space-y-4"
+                >
+                <h2 className="text-2xl font-bold text-center">Register</h2>
+                {popupVisible && (
+                    <Popup
+                    message={errorPopup || messagePopup}
+                    status={errorPopup ? 'error' : 'success'}
+                    onClose={closePopup}
+                    />
+                )}
+                <input
+                    type="text"
+                    placeholder="Name"
+                    value={username}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    required
                 />
-            )}
-            <input
-                type="text"
-                placeholder="Name"
-                value={username}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border rounded"
-                required
-            />
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 border rounded"
-                required
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 border rounded"
-                required
-            />
-            <input
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-2 border rounded"
-                required
-            />
-            <button
-                type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-            >
-                Register
-            </button>
-            </form>
-            <Link to="/login" className="text-blue-600 hover:underline block text-center mt-4">
-                Already have an account? Login
-            </Link>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    required
+                />
+                <button
+                    type="submit"
+                    className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+                >
+                    Register
+                </button>
+                </form>
+                <Link to="/login" className="text-blue-600 hover:underline">Already have an account? Login</Link>
+            </div>
         </div>
-        </div>
-
     )
 }
 
