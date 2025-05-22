@@ -48,7 +48,7 @@ function Login() {
         // send an api call to the backend
         try {
         // Send the POST request to the backend
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}login`, {
             method: 'POST', // Specify the HTTP method
             headers: {
             'Content-Type': 'application/json', // Send data as JSON
