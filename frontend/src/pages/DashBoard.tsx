@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import dapImage from "../assets/dap.jpg";
 import { useNavigate, Link } from 'react-router-dom'
 import { LogOut } from 'lucide-react';

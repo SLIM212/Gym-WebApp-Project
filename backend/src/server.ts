@@ -16,7 +16,10 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors()); 
+app.use(cors({
+  origin: ['http://localhost:5000', 'https://your-frontend.netlify.app'], // replace with your Netlify or Vercel URL
+  credentials: true
+})); 
 app.use(express.json());
 
 // Basic Test Routes

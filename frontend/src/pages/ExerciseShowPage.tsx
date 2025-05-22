@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams} from "react-router-dom";
 import Exercise from "../components/exercise";
 import './pages.css';
 import apiCall from "../helpers/apiCall.tsx";

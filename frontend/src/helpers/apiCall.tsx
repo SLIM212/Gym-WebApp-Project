@@ -1,5 +1,5 @@
 export default async function apiCall({ url, method, body }: { url: string; method: string; body?: any }) {
-  const defaultUrl = 'http://localhost:5000/';
+  const defaultUrl = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem('user-token');
 
   const options = {
