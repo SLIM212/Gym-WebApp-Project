@@ -8,7 +8,7 @@ import { addUser, checkEmailExists, checkUsernameExists, emailPass, usernamePass
 // Setup
 dotenv.config();
 const app: Express = express();
-const JWT_SECRET: string = 'gymappforthewin';
+const JWT_SECRET: string = process.env.JWT_SECRET || 'fallback_secret';
 app.use(cors());
 app.use(express.json());
 const USERNAME_MIN_LEN = 5;

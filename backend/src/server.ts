@@ -7,7 +7,6 @@ import {getAllExercises, createOrUpdateExercise, deleteExercise} from "./data"
 import {login, register} from './auth';
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET: string = 'gymappforthewin';
 
 // Load environment variables
 dotenv.config();

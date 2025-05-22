@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Setup
 dotenv.config();
 const jwt = require('jsonwebtoken');
-const JWT_SECRET: string = 'gymappforthewin';
+const JWT_SECRET: string = process.env.JWT_SECRET || 'fallback_secret';
 const DATABASE_PATH = './database.json';
 
 type ExerciseCategory = {
