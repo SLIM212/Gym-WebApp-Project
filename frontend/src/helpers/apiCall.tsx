@@ -1,6 +1,8 @@
 export default async function apiCall({ url, method, body }: { url: string; method: string; body?: any }) {
   const defaultUrl = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem('user-token');
+  console.log('API URL:', import.meta.env.VITE_API_URL);
+
 
   const options = {
     method: method.toUpperCase(),
