@@ -57,7 +57,7 @@ function Register() {
         // send an api call to the backend
         try {
         // Send the POST request to the backend
-        const response = await fetch('import.meta.env.VITE_API_URL/register', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
             method: 'POST', // Specify the HTTP method
             headers: {
             'Content-Type': 'application/json', // Send data as JSON
