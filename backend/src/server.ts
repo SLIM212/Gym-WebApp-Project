@@ -7,7 +7,6 @@ import {getAllExercises, createOrUpdateExercise, deleteExercise} from "./data"
 import {login, register} from './auth';
 import jwt from "jsonwebtoken";
 
-
 // Load environment variables
 dotenv.config();
 
@@ -16,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5000', 'https://your-frontend.netlify.app'], // replace with your Netlify or Vercel URL
+  origin: ['http://localhost:5000', 'https://gym-webapp-project.onrender.com'], // replace with your Netlify or Vercel URL
   credentials: true
 })); 
 app.use(express.json());
