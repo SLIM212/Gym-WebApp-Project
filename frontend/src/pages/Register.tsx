@@ -52,6 +52,8 @@ function Register() {
             email,
             password
         };
+        console.log('API URL: register', import.meta.env.VITE_API_URL);
+
         // send an api call to the backend
         try {
         // Send the POST request to the backend
