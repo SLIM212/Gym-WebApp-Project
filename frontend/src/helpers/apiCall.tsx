@@ -3,8 +3,6 @@ export default async function apiCall({ url, method, body }: { url: string; meth
   console.log('API URL:', defaultUrl + url);
   const token = localStorage.getItem('user-token');
   
-
-
   const options = {
     method: method.toUpperCase(),
     headers: {

@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5000', 'https://gym-webapp-project-2plv.onrender.com'], // replace with your Netlify or Vercel URL
+  origin: ['http://localhost:5000', 'https://gym-webapp-project-2plv.onrender.com'], 
   credentials: true
 })); 
 app.use(express.json());
