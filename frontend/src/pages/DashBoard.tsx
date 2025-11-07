@@ -27,9 +27,21 @@ return (
             Gym Progress Tracker
         </div>
         <img
-            className="w-[70%] mx-auto"
             src={dapImage}
             alt="dap-img"
+            className="
+                mx-auto 
+                w-[90%]          /* mobile: 90% width */
+                sm:w-[80%]       /* small screens: 80% */
+                md:w-[70%]       /* medium screens: 70% */
+                lg:w-[60%]       /* large screens: 60% */
+                xl:w-[50%]       /* extra-large: 50% */
+                max-w-[700px]    /* cap size so it doesn’t get huge on wide monitors */
+                rounded-xl
+                transition-transform
+                duration-300
+                hover:scale-105
+            "
         />
         <br></br>
         {/* use flex box to make 4 boxes that hover when mouse is over and has text on bottom left in white */}

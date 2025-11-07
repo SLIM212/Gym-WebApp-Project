@@ -47,23 +47,23 @@ function Login() {
         };
         // send an api call to the backend
         try {
-        // Send the POST request to the backend
-        const response = await fetch(`${import.meta.env.VITE_API_URL}login`, {
-            method: 'POST', // Specify the HTTP method
-            headers: {
-            'Content-Type': 'application/json', // Send data as JSON
-            },
-            body: JSON.stringify(requestData), // Convert the request data to a JSON string
-        });
-        // Handle successful registration
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error);
-        }
-        navigate('/dashboard'); // Redirect to the Dashboard page
-        localStorage.setItem('user-token', data.token); // save token to localStorage
-        // to use for creating games
-        localStorage.setItem('user-email', usernameOrEmail);
+            // Send the POST request to the backend
+            const response = await fetch(`${import.meta.env.VITE_API_URL}login`, {
+                method: 'POST', // Specify the HTTP method
+                headers: {
+                'Content-Type': 'application/json', // Send data as JSON
+                },
+                body: JSON.stringify(requestData), // Convert the request data to a JSON string
+            });
+            // Handle successful registration
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error);
+            }
+            navigate('/dashboard'); // Redirect to the Dashboard page
+            localStorage.setItem('user-token', data.token); // save token to localStorage
+            // to use for creating games
+            localStorage.setItem('user-email', usernameOrEmail);
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message);
