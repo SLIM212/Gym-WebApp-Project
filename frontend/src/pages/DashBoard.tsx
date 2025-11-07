@@ -40,7 +40,6 @@ return (
                 rounded-xl
                 transition-transform
                 duration-300
-                hover:scale-105
             "
         />
         <br></br>
