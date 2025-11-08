@@ -17,6 +17,12 @@
       "username": "sammm",
       "email": "sam@email.com",
       "password": "$2b$10$gDPNQddxM9XHXKKQnaY5RO3GBM/pX6j67fCpJSXpjWqhgcvEswn7W"
+    },
+    {
+      "userId": "dc362a1b-eb02-4dd4-94e2-51f721c6e2b9",
+      "username": "sasdffd",
+      "email": "samuellim246@gmail.com",
+      "password": "$2b$10$jNVrN6xX8OQiNvk2X6qnkuuzhdC8/LdzYd4vF1It59CZt1PvT2lQ6"
     }
   ],
   "exercises": [

@@ -70,8 +70,7 @@ function Login() {
             } else {
                 setError("An unknown error occurred");
             }
-        }
-            
+        }     
     }
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-6">
