@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -104,11 +95,10 @@ function changePassword(usernameOrEmail, newPassword) {
 // exerices 
 // Creates or updates an exercise for a user
 // Takes in exercise body part, exercise name, and exercise weight
-const createOrUpdateExercise = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const createOrUpdateExercise = async (req, res) => {
     const { exerciseSection, exerciseName, exerciseWeight, exerciseId } = req.body;
     // need to get userId by decoding authoization header token//
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // "Bearer <token>"
+    const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
     }
@@ -154,13 +144,12 @@ const createOrUpdateExercise = (req, res) => __awaiter(void 0, void 0, void 0, f
     catch (err) {
         res.status(401).json({ error: "Invalid or expired token" });
     }
-});
+};
 exports.createOrUpdateExercise = createOrUpdateExercise;
 // Get all exercises for a user
-const getAllExercises = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const getAllExercises = async (req, res) => {
     // need to get userId by decoding authoization header token //
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // "Bearer <token>"
+    const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
     }
@@ -181,14 +170,13 @@ const getAllExercises = (req, res) => __awaiter(void 0, void 0, void 0, function
     catch (err) {
         res.status(401).json({ error: "Invalid or expired token" });
     }
-});
+};
 exports.getAllExercises = getAllExercises;
 // delete given exercise
-const deleteExercise = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const deleteExercise = async (req, res) => {
     const { exerciseId, exerciseSection } = req.body;
     // need to get userId by decoding authoization header token //
-    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // "Bearer <token>"
+    const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
     }
@@ -224,27 +212,25 @@ const deleteExercise = (req, res) => __awaiter(void 0, void 0, void 0, function*
     catch (err) {
         res.status(401).json({ error: "Invalid or expired token" });
     }
-});
+};
 exports.deleteExercise = deleteExercise;
 /**********************************
  * Helper Functions
  **********************************/
 // Given a token, returns the userId as a number
-function userFromToken(token) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Obtain user_id from token
-        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            jwt.verify(token, JWT_SECRET, (err, data) => {
-                if (err) {
-                    console.log("Message " + err.message);
-                    reject(err);
-                    return;
-                }
-                let check = data;
-                if (check.sub)
-                    resolve(parseInt(check.sub));
-            });
-        }));
+async function userFromToken(token) {
+    // Obtain user_id from token
+    return new Promise(async (resolve, reject) => {
+        jwt.verify(token, JWT_SECRET, (err, data) => {
+            if (err) {
+                console.log("Message " + err.message);
+                reject(err);
+                return;
+            }
+            let check = data;
+            if (check.sub)
+                resolve(parseInt(check.sub));
+        });
     });
 }
 const generateUserId = () => {

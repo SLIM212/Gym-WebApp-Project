@@ -66,4 +66,3 @@ app.put("/createExercise", createOrUpdateExercise);
 app.delete("/deleteExercise", deleteExercise)
 // app.get takes in token and body part and returns all exercises currently in that part for user
 // app.post takes in token and body part and exercise object whcih has exercise name and weight
-// stores in the users file in the sql database
