@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "source": "backend",
+    "runtime": "nodejs22",
+    "predeploy": [
+      "npm --prefix backend run build"
+    ]
+  },
+  "hosting": {
+    "public": "frontend/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "api"
+      }
+    ]
+  }
+}

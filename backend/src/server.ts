@@ -1,68 +1,53 @@
-// Importing required modules
-import express, { Request, Response } from "express"; // Express framework and type definitions (for TypeScript)
-import cors from "cors"; // Cross-Origin Resource Sharing, allows your API to be accessible from different domains
-import dotenv from "dotenv"; // Loads environment variables from a .env file into process.env
-import axios from "axios"; // HTTP client for making requests to external APIs
-import {getAllExercises, createOrUpdateExercise, deleteExercise} from "./data"
-import {login, register} from './auth';
-import jwt from "jsonwebtoken";
+import express from "express";
+import dotenv from "dotenv";
+import { onRequest } from "firebase-functions/v2/https";
+import { setGlobalOptions } from "firebase-functions/v2";
+import { login, register } from "./auth";
+import { getAllExercises, createOrUpdateExercise, deleteExercise } from "./data";
 
 dotenv.config();
 const app = express();
 
+// ✅ Allowed origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://gym-web-app-project.web.app",
+];
+
+// ✅ Manual CORS handling for Cloud Run
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  }
+
+  // 🔹 Respond to preflight requests immediately
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  next();
+});
+
 app.use(express.json());
 
-// ✅ Proper CORS setup
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-// ✅ Ensure preflight requests are handled
-app.options("*", cors());
-
-app.use(express.json());
-
-// Basic Test Routes
-app.get("/", (req: Request, res: Response) => {
-    res.send("Backend Server Alive");
-});
-
-app.get("/info", (req: Request, res: Response) => {
-    res.send("This is my gym tracker app");
-});
-
-// Determine the port to listen on
-const PORT = process.env.PORT ? Number(process.env.PORT) : 5000;
-
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
-/**
- * Function to Login user
- * @route POST /login
- * @param {string} req.body.usernameOrEmail - username or email
- * @param {string} req.body.password - password
- * @returns {Response} -  Empty response with status code 200 for success 400 for fail
- */
+// ✅ Routes
 app.post("/login", login);
-/**
- * Function to Register user
- * @route POST /register
- * @param {string} req.body.username - username
- * @param {string} req.body.email - email 
- * @param {string} req.body.password  - password
- * @returns {Response} - Empty response with status code 200 for success 400 for fail
- */
 app.post("/register", register);
-// chest, back, arms and leg exercises api endpoints
 app.get("/getAllExercises", getAllExercises);
 app.put("/createExercise", createOrUpdateExercise);
-app.delete("/deleteExercise", deleteExercise)
-// app.get takes in token and body part and returns all exercises currently in that part for user
-// app.post takes in token and body part and exercise object whcih has exercise name and weight
+app.delete("/deleteExercise", deleteExercise);
+
+// ✅ Local dev server (when not running on Firebase)
+if (!process.env.FIREBASE_CONFIG) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`✅ Local server running on port ${PORT}`));
+}
+
+// ✅ Firebase config
+setGlobalOptions({ region: "us-central1", memory: "256MiB", timeoutSeconds: 60 });
+export const api = onRequest(app);

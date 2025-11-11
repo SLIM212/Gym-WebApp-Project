@@ -103,6 +103,21 @@
           }
         ]
       }
+    },
+    {
+      "userId": "dc362a1b-eb02-4dd4-94e2-51f721c6e2b9",
+      "exercises": {
+        "chest": [],
+        "arms": [],
+        "legs": [],
+        "back": [
+          {
+            "exerciseId": "f09859a0-254c-46b5-8eae-88632d07d4da",
+            "exerciseName": "Rows",
+            "exerciseWeight": 15
+          }
+        ]
+      }
     }
   ]
 }

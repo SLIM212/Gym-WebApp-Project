@@ -32,6 +32,15 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -61,7 +70,7 @@ const TOKEN_TIMEOUT = 3600;
  * @param req.body.password
  * @returns res.status(200).json(token) on success and res.status(400) on fail
  */
-const login = async (req, res) => {
+const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const bcrypt = require('bcryptjs');
     // take in inputs from HTTP request
     const { usernameOrEmail, password } = req.body;
@@ -71,15 +80,15 @@ const login = async (req, res) => {
     try {
         if (email) {
             // Check email exists in database
-            userId = await (0, data_1.checkEmailExists)(usernameOrEmail);
+            userId = yield (0, data_1.checkEmailExists)(usernameOrEmail);
             if (userId === '') { // Value of 0 means no database entry with that email found
                 res.status(ERROR_CODE).json({ error: 'Invalid User Credentials' });
                 return;
             }
             // Obtain password from database
             // checking if hashed password is the same as one in database
-            let pass = await (0, data_1.emailPass)(usernameOrEmail);
-            const passwordMatch = await bcrypt.compare(password, pass);
+            let pass = yield (0, data_1.emailPass)(usernameOrEmail);
+            const passwordMatch = yield bcrypt.compare(password, pass);
             if (!passwordMatch) {
                 res.status(ERROR_CODE).json({ error: 'Invalid User Credentials' });
                 return;
@@ -87,14 +96,14 @@ const login = async (req, res) => {
         }
         else {
             // Check if username exists in database
-            userId = await (0, data_1.checkUsernameExists)(usernameOrEmail);
+            userId = yield (0, data_1.checkUsernameExists)(usernameOrEmail);
             if (userId === '') { // Value of 0 means no database entry with that username found
                 res.status(ERROR_CODE).json({ error: 'Invalid User Credentials' });
                 return;
             }
             // Obtain password from database
-            let pass = await (0, data_1.usernamePass)(usernameOrEmail);
-            const passwordMatch = await bcrypt.compare(password, pass);
+            let pass = yield (0, data_1.usernamePass)(usernameOrEmail);
+            const passwordMatch = yield bcrypt.compare(password, pass);
             if (!passwordMatch) {
                 res.status(ERROR_CODE).json({ error: 'Invalid User Credentials' });
                 return;
@@ -109,7 +118,7 @@ const login = async (req, res) => {
     // Return success with the token
     res.status(SUCCESS_CODE).json({ token: jsonwebtoken_1.default.sign({ sub: userId }, JWT_SECRET, { algorithm: 'HS256', expiresIn: TOKEN_TIMEOUT }) });
     return;
-};
+});
 exports.login = login;
 /**
  * Register function handles user validation and token sending
@@ -117,7 +126,7 @@ exports.login = login;
  * @param req.body.password
  * @returns res.status(200).json(token) on success and res.status(400) on fail
  */
-const register = async (req, res) => {
+const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = req.body;
     const bcrypt = require('bcryptjs');
     // Basic validation
@@ -142,13 +151,13 @@ const register = async (req, res) => {
     }
     try {
         // Check if username is already taken
-        let result = await (0, data_1.checkUsernameExists)(username);
+        let result = yield (0, data_1.checkUsernameExists)(username);
         if (result !== null) {
             res.status(ERROR_CODE).json({ error: 'Username already in use' });
             return;
         }
         // Check if email is already taken
-        result = await (0, data_1.checkEmailExists)(email);
+        result = yield (0, data_1.checkEmailExists)(email);
         if (result !== null) {
             res.status(ERROR_CODE).json({ error: 'Email already in use' });
             return;
@@ -161,11 +170,11 @@ const register = async (req, res) => {
     }
     // need to bcrypt the password before sending it to the backend
     const saltRounds = 10; // Cost factor - higher is more secure but slower
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = yield bcrypt.hash(password, saltRounds);
     // Add new user to database
     (0, data_1.addUser)(username, email, hashedPassword);
     // Return success status
     res.status(SUCCESS_CODE).json({ message: "Registration successful" });
     return;
-};
+});
 exports.register = register;
