@@ -1,27 +1,24 @@
 import dotenv from "dotenv";
 import fs from 'fs';
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
-
+import admin from "firebase-admin";
 
 // Setup
 dotenv.config();
-const jwt = require('jsonwebtoken');
-const JWT_SECRET: string = process.env.JWT_SECRET || 'fallback_secret';
 const DATABASE_PATH = './database.json';
+
+// Initialize Firebase Admin once for token authentication
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+  });
+}
 
 type ExerciseCategory = {
     exerciseName: string;
     exerciseWeight: number;
     exerciseId: string;
-};
-
-type User = {
-    userId: string;
-    username: string;
-    email: string;
-    password: string;
 };
 
 type UserExercises = {
@@ -35,13 +32,12 @@ type UserExercises = {
 };
 
 type Database = {
-    users: User[];
-    exercises: UserExercises[];
+  exercises: UserExercises[];
 };
+
 
 // JSON Data (in-memory) with Type
 let database: Database = {
-    users: [],
     exercises: []
 };
 
@@ -53,11 +49,10 @@ let database: Database = {
         const fileContents = fs.readFileSync(DATABASE_PATH, { encoding: 'utf8' }).trim();
         database = JSON.parse(fileContents) as Database;
         // Ensure the structure is properly loaded
-        if (!Array.isArray(database.users)) database.users = [];
         if (!Array.isArray(database.exercises)) database.exercises = [];
     } else {
         console.log("Setting Up New Database");
-        database = { users: [], exercises: [] };
+        database = { exercises: [] };
         saveDatabase();
     }
 })();
@@ -65,51 +60,6 @@ let database: Database = {
 // Save JSON Database to File
 function saveDatabase() {
     fs.writeFileSync(DATABASE_PATH, JSON.stringify(database, null, 2), 'utf-8');
-}
-
-/**********************************
- * User Management Functions
- **********************************/
-// Check that email exists and return user id
-export function checkEmailExists(usernameOrEmail: string): string | null {
-    const user = database.users.find(user => user.email === usernameOrEmail);
-    return user ? user.userId : null;  // Return the userId if found, otherwise null
-}
-
-// Check that username exists and return user id
-export function checkUsernameExists(username: string): string | null {
-    const user = database.users.find(user => user.username === username);
-    return user ? user.userId : null;  // Return the userId if found, otherwise null
-}
-
-// register function calls this function to add a new user
-export function addUser(username: string, email: string, password: string) {
-    if (checkUsernameExists(username) || checkEmailExists(email)) {
-        throw new Error("Username or Email already exists");
-    }
-    // create a userId which is a string
-    const userId = generateUserId();
-    database.users.push({ userId, username, email, password });
-    saveDatabase();
-}
-
-// gives password for email
-export function emailPass(usernameOrEmail: string): string | null {
-    const user = database.users.find(user => user.email === usernameOrEmail);
-    return user ? user.password : null;
-}
-
-// gives password from username
-export function usernamePass(usernameOrEmail: string): string | null {
-    const user = database.users.find(user => user.username === usernameOrEmail);
-    return user ? user.password : null;
-}
-
-export function changePassword(usernameOrEmail: string, newPassword: string): void {
-    const user = database.users.find(user => user.username === usernameOrEmail || user.email === usernameOrEmail);
-    if (!user) throw new Error("User not found");
-    user.password = newPassword;
-    saveDatabase();
 }
 
 /**********************************
@@ -129,10 +79,11 @@ export const createOrUpdateExercise = async (req: Request, res: Response): Promi
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
+        return;
     }
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { sub: string };
-        const userId = decoded.sub;
+        const decoded = await admin.auth().verifyIdToken(token);
+        const userId = decoded.uid;
         // Validate input
         if (!exerciseSection || !exerciseName || !exerciseWeight || !exerciseId) {
             throw new Error("Invalid data" );
@@ -179,10 +130,11 @@ export const getAllExercises = async (req: Request, res: Response): Promise<void
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
+        return;
     }
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { sub: string };
-        const userId = decoded.sub;
+        const decoded = await admin.auth().verifyIdToken(token);
+        const userId = decoded.uid;
         // Ensure the username or email is provided in the query
         // Find the user's exercises from the database
         const userExercises = database.exercises.find(entry => entry.userId === userId);
@@ -205,10 +157,11 @@ export const deleteExercise = async (req: Request, res: Response): Promise<void>
     const token = req.headers.authorization?.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
+        return;
     }
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { sub: string };
-        const userId = decoded.sub;
+        const decoded = await admin.auth().verifyIdToken(token);
+        const userId = decoded.uid;
         // Validate input
         if (!exerciseSection || !exerciseId) {
             throw new Error("Invalid data" );
@@ -241,26 +194,6 @@ export const deleteExercise = async (req: Request, res: Response): Promise<void>
 /**********************************
  * Helper Functions
  **********************************/
-
-// Given a token, returns the userId as a number
-export async function userFromToken (token: string): Promise<number> {
-    // Obtain user_id from token
-    return new Promise(async (resolve, reject) => {
-        jwt.verify(token, JWT_SECRET, (err: Error | null, data: JwtPayload | null) => {
-        if (err) {
-            console.log("Message " + err.message)
-            reject(err);
-            return;
-        }
-        let check = data as JwtPayload;
-        if (check.sub) resolve(parseInt(check.sub));
-        });
-    });
-}
-
-const generateUserId = (): string => {
-    return uuidv4(); // Generates a unique user ID
-};
 
 const generateExerciseId = (): string => {
     return uuidv4(); // Generates a unique user ID

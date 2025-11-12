@@ -55,7 +55,6 @@ export default function ExerciseGroup() {
         }
     }, [editExercise, exerciseToEdit, showModal]);
 
-
     // used to retrieve all the exercises for given exercise group on page load
     useEffect(() => {
         getAllExercises();

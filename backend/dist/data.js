@@ -13,24 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteExercise = exports.getAllExercises = exports.createOrUpdateExercise = void 0;
-exports.checkEmailExists = checkEmailExists;
-exports.checkUsernameExists = checkUsernameExists;
-exports.addUser = addUser;
-exports.emailPass = emailPass;
-exports.usernamePass = usernamePass;
-exports.changePassword = changePassword;
-exports.userFromToken = userFromToken;
 const dotenv_1 = __importDefault(require("dotenv"));
 const fs_1 = __importDefault(require("fs"));
 const uuid_1 = require("uuid");
+const firebase_admin_1 = __importDefault(require("firebase-admin"));
 // Setup
 dotenv_1.default.config();
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 const DATABASE_PATH = './database.json';
+// Initialize Firebase Admin once for token authentication
+if (!firebase_admin_1.default.apps.length) {
+    firebase_admin_1.default.initializeApp({
+        credential: firebase_admin_1.default.credential.applicationDefault(),
+    });
+}
 // JSON Data (in-memory) with Type
 let database = {
-    users: [],
     exercises: []
 };
 // Initialize JSON Database (Load or Create)
@@ -40,60 +37,18 @@ let database = {
         const fileContents = fs_1.default.readFileSync(DATABASE_PATH, { encoding: 'utf8' }).trim();
         database = JSON.parse(fileContents);
         // Ensure the structure is properly loaded
-        if (!Array.isArray(database.users))
-            database.users = [];
         if (!Array.isArray(database.exercises))
             database.exercises = [];
     }
     else {
         console.log("Setting Up New Database");
-        database = { users: [], exercises: [] };
+        database = { exercises: [] };
         saveDatabase();
     }
 })();
 // Save JSON Database to File
 function saveDatabase() {
     fs_1.default.writeFileSync(DATABASE_PATH, JSON.stringify(database, null, 2), 'utf-8');
-}
-/**********************************
- * User Management Functions
- **********************************/
-// Check that email exists and return user id
-function checkEmailExists(usernameOrEmail) {
-    const user = database.users.find(user => user.email === usernameOrEmail);
-    return user ? user.userId : null; // Return the userId if found, otherwise null
-}
-// Check that username exists and return user id
-function checkUsernameExists(username) {
-    const user = database.users.find(user => user.username === username);
-    return user ? user.userId : null; // Return the userId if found, otherwise null
-}
-// register function calls this function to add a new user
-function addUser(username, email, password) {
-    if (checkUsernameExists(username) || checkEmailExists(email)) {
-        throw new Error("Username or Email already exists");
-    }
-    // create a userId which is a string
-    const userId = generateUserId();
-    database.users.push({ userId, username, email, password });
-    saveDatabase();
-}
-// gives password for email
-function emailPass(usernameOrEmail) {
-    const user = database.users.find(user => user.email === usernameOrEmail);
-    return user ? user.password : null;
-}
-// gives password from username
-function usernamePass(usernameOrEmail) {
-    const user = database.users.find(user => user.username === usernameOrEmail);
-    return user ? user.password : null;
-}
-function changePassword(usernameOrEmail, newPassword) {
-    const user = database.users.find(user => user.username === usernameOrEmail || user.email === usernameOrEmail);
-    if (!user)
-        throw new Error("User not found");
-    user.password = newPassword;
-    saveDatabase();
 }
 /**********************************
  * Exercise Management Functions
@@ -111,10 +66,11 @@ const createOrUpdateExercise = (req, res) => __awaiter(void 0, void 0, void 0, f
     const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
+        return;
     }
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const userId = decoded.sub;
+        const decoded = yield firebase_admin_1.default.auth().verifyIdToken(token);
+        const userId = decoded.uid;
         // Validate input
         if (!exerciseSection || !exerciseName || !exerciseWeight || !exerciseId) {
             throw new Error("Invalid data");
@@ -163,10 +119,11 @@ const getAllExercises = (req, res) => __awaiter(void 0, void 0, void 0, function
     const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
+        return;
     }
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const userId = decoded.sub;
+        const decoded = yield firebase_admin_1.default.auth().verifyIdToken(token);
+        const userId = decoded.uid;
         // Ensure the username or email is provided in the query
         // Find the user's exercises from the database
         const userExercises = database.exercises.find(entry => entry.userId === userId);
@@ -191,10 +148,11 @@ const deleteExercise = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // "Bearer <token>"
     if (!token) {
         res.status(401).json({ error: "Token is required" });
+        return;
     }
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const userId = decoded.sub;
+        const decoded = yield firebase_admin_1.default.auth().verifyIdToken(token);
+        const userId = decoded.uid;
         // Validate input
         if (!exerciseSection || !exerciseId) {
             throw new Error("Invalid data");
@@ -229,27 +187,6 @@ exports.deleteExercise = deleteExercise;
 /**********************************
  * Helper Functions
  **********************************/
-// Given a token, returns the userId as a number
-function userFromToken(token) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Obtain user_id from token
-        return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            jwt.verify(token, JWT_SECRET, (err, data) => {
-                if (err) {
-                    console.log("Message " + err.message);
-                    reject(err);
-                    return;
-                }
-                let check = data;
-                if (check.sub)
-                    resolve(parseInt(check.sub));
-            });
-        }));
-    });
-}
-const generateUserId = () => {
-    return (0, uuid_1.v4)(); // Generates a unique user ID
-};
 const generateExerciseId = () => {
     return (0, uuid_1.v4)(); // Generates a unique user ID
 };

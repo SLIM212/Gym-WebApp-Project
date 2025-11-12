@@ -2,8 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import { onRequest } from "firebase-functions/v2/https";
 import { setGlobalOptions } from "firebase-functions/v2";
-import { login, register } from "./auth";
 import { getAllExercises, createOrUpdateExercise, deleteExercise } from "./data";
+import admin from "firebase-admin";
 
 dotenv.config();
 const app = express();
@@ -35,9 +35,14 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// ✅ Routes
-app.post("/login", login);
-app.post("/register", register);
+// Initialize the Admin SDK
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(), // or cert() if using a service account JSON
+  });
+}
+
+// ✅ Routes auth functions are taken care of by Firebase Auth
 app.get("/getAllExercises", getAllExercises);
 app.put("/createExercise", createOrUpdateExercise);
 app.delete("/deleteExercise", deleteExercise);

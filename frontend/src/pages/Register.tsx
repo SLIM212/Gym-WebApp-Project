@@ -3,10 +3,11 @@ import Popup from '../components/Popup.tsx';
 import { useNavigate, Link } from 'react-router-dom';
 import '../index.css';
 import '../App.css';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 function Register() {
     const navigate = useNavigate();
-    const [username, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -17,9 +18,13 @@ function Register() {
     // to prevent users from navigating to login page if they are already logged in via the search bar
     useEffect(() => {
         if (localStorage.getItem('user-token')) {
-        navigate('/dashboard');
+            navigate('/dashboard');
         }
     }, [navigate]);
+
+    useEffect(() => {
+        // Do not auto-redirect on the register page
+    }, []);
 
     // Trigger the popup visibility when either errorPopup or messagePopup changes
     useEffect(() => {
@@ -38,7 +43,7 @@ function Register() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setError('')
-        if (!username || !email || !password || !confirmPassword) {
+        if (!email || !password || !confirmPassword) {
             setError('Please fill in all fields.')
             return
         }
@@ -46,38 +51,14 @@ function Register() {
             setError('Passwords do not match.')
             return
         }
-        // Prepare the data for the API call
-        const requestData = {
-            username,
-            email,
-            password
-        };
-        console.log('API URL: register', import.meta.env.VITE_API_URL);
-
-        // send an api call to the backend
+        // create the user in Firebase Authentication
         try {
-        // Send the POST request to the backend
-        const response = await fetch(`${import.meta.env.VITE_API_URL}register`, {
-            method: 'POST', // Specify the HTTP method
-            headers: {
-            'Content-Type': 'application/json', // Send data as JSON
-            },
-            body: JSON.stringify(requestData), // Convert the request data to a JSON string
-        });
-        // Handle successful registration
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.error);
-        }
-        navigate('/login'); // Redirect to the login page
-        localStorage.setItem('user-email', email);
-        // localStorage.setItem('user-token', data.token); // save token to localStorage
-        } catch (error) {
-            if (error instanceof Error) {
-                setError(error.message);
-            } else {
-                setError("An unknown error occurred");
-            }
+            // create the user in Firebase Authentication
+            await createUserWithEmailAndPassword(auth, email, password);
+            navigate('/login'); // Redirect to the login page
+        } catch (err: any) {
+            console.log(err.message);
+            setError(err.message);
         }
     }
 
@@ -96,14 +77,6 @@ function Register() {
                     onClose={closePopup}
                     />
                 )}
-                <input
-                    type="text"
-                    placeholder="Name"
-                    value={username}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    required
-                />
                 <input
                     type="email"
                     placeholder="Email"
@@ -135,7 +108,7 @@ function Register() {
                     Register
                 </button>
                 </form>
-                <Link to="/login" className="text-blue-600 hover:underline">Already have an account? Login</Link>
+                <Link to="/login" className="text-blue-600 hover:underline mt-2 text-center">Already have an account? Login</Link>
             </div>
         </div>
     )

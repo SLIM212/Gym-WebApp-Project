@@ -8,8 +8,8 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
-const auth_1 = require("./auth");
 const data_1 = require("./data");
+const firebase_admin_1 = __importDefault(require("firebase-admin"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 // ✅ Allowed origins
@@ -34,9 +34,13 @@ app.use((req, res, next) => {
     next();
 });
 app.use(express_1.default.json());
-// ✅ Routes
-app.post("/login", auth_1.login);
-app.post("/register", auth_1.register);
+// Initialize the Admin SDK
+if (!firebase_admin_1.default.apps.length) {
+    firebase_admin_1.default.initializeApp({
+        credential: firebase_admin_1.default.credential.applicationDefault(), // or cert() if using a service account JSON
+    });
+}
+// ✅ Routes auth functions are taken care of by Firebase Auth
 app.get("/getAllExercises", data_1.getAllExercises);
 app.put("/createExercise", data_1.createOrUpdateExercise);
 app.delete("/deleteExercise", data_1.deleteExercise);
